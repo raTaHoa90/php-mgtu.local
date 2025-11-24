@@ -9,7 +9,7 @@
 </head>
 <body>
     <?php
-        RunIsGet($_GET);
+        RunIsGet($_POST);
 
         $guess = rand(0, 999);
         echo '<ul>';
@@ -21,7 +21,7 @@
         echo '</ul>';
     ?>
     <hr>
-    <form action="?">
+    <form action="?" method="POST">
         <input type="hidden" value="<?= $guess ?>" name="guess">
         <table>
             <tr>

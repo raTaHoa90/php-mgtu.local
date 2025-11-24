@@ -1,0 +1,361 @@
+@import "anim.css";
+/*@import "styles410.css" screen  and (width < 420px);*/
+
+:root {
+    --color-border: rgba(0,0,255, .5);
+    --sub-menu-margin: 0;
+    --header-height: 100px;
+    --menu-width: 80px;
+    --gr-gray: linear-gradient(#eee, #ccc 80%);
+}
+
+.-grid-page{
+    min-height: 100vh;
+    display: grid;
+    grid-template-areas: 
+        "header header header header"
+        ". content aside ."
+        "footer footer footer footer";
+    grid-template-columns: auto 600px 100px auto;
+    grid-template-rows: var(--header-height) auto 30px;
+}
+
+header {
+    grid-area: header;
+}
+
+footer {
+    grid-area: footer;
+}
+
+#content {
+    grid-area: content;
+}
+
+#content article {
+    & > img {
+        vertical-align: top;
+        margin: 5px;
+        float: right;
+        shape-outside: circle(35%);
+    }
+
+    img {
+        clip-path: circle(35%);
+        margin: -10px;
+    }
+
+    p {
+        padding: 5px;
+    }
+
+    p:has(img) {
+        color: darkred;
+    }
+
+    p:nth-child(3n) {
+        background: lightgray;
+    }
+    
+    p::first-letter {
+        color: red;
+        font-size: 30px;
+    }
+
+    p:first-child {
+        background: yellow;
+    }
+
+    p:last-child {
+        background: yellowgreen;
+    }
+}
+
+aside {
+    grid-area: aside;
+}
+
+.-grid {
+    margin-top: 50px;
+    margin-bottom: 100px;
+    display: grid;
+    /*grid-template-columns: [one] 80px [two] 2fr [three] 1fr [four];
+    grid-template-rows: 30px 100px;*/
+    grid-template: 30px 100px / [one] 80px [two] 2fr [three] 1fr [four];
+    grid-auto-rows: 200px;
+    grid-row-gap: 20px;
+    grid-column-gap: 10px;
+}
+.-d5 {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+.-d9 {
+    grid-column: two / four;
+    grid-row: 2 / 3;
+}
+
+.-grid > div{
+    display: inline-block;
+    border: solid 1px red;
+    padding: 10px;
+}
+
+#bars {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+html {
+    scroll-behavior:smooth;
+}
+
+body {
+    user-select: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* HEADER */
+
+header {
+    height: var(--header-height);
+    margin-bottom: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+}
+
+header > img {
+    max-height: 80px;
+    vertical-align: middle;
+}
+
+nav {
+    display: inline-block;
+}
+
+header ol {
+    & > li{
+        display: inline-block;
+        position: relative;
+        margin: var(--sub-menu-margin);
+        width: var(--menu-width);
+        box-sizing: border-box;
+
+        .btn {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        a {
+            border-bottom: solid var(--color-border) 3px !important;
+        }
+    }
+
+    ol ol>li a{
+        border-top: dotted 3px var(--color-border) !important;
+    }
+}
+
+#s2m3 {
+    display: none;
+    position: absolute;
+    width: 100px;
+    top: 50px;
+    left: 5vw;
+    background: white;
+    border: solid 1px gray;
+    padding: 3px;
+}
+a:hover+#s2m3{
+    display: inline-block;
+}
+
+header ol ol{
+    position: absolute;
+    left: -40px;
+    top: 32px;
+    display: none;
+    z-index: 1000;
+    --color-border: red;
+    --sub-menu-margin: 0;
+    --menu-width: 100px;
+}
+
+header ol ol ol{
+    left: calc(var(--menu-width) - var(--menu-width) / 2 + 10px );
+    top: 0px;
+    z-index: 2000;
+    --color-border: darkmagenta;
+}
+header ol ol>*{
+    --menu-width: 100px;
+}
+
+header ol ol ol>*{
+    --menu-width: 200px;
+}
+
+header ol > li:hover > ol {
+    display: inline-block;
+}
+
+/* FOOTER */
+
+footer {
+    height: 30px;
+    font-size: 10px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    bottom: 0;
+}
+
+footer, header {
+    background: var(--gr-gray);
+}
+
+/* CONTENT */
+
+.-flex {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex-flow: row wrap;
+    min-height: calc(100vh - 50px - var(--header-height));
+}
+
+.-flex > *{
+    max-width: 600px;
+}
+
+aside {
+    max-width: 100px !important;
+}
+
+/* :is(div, u, b) > span :is(b, i, p){*/
+/* :where(div, u, b) > span :where(b, i, p){*/
+
+/*div>span b, div>span i, div>span p, 
+u>span b, u>span i, u>span p, 
+b>span b, b>span i, b>span p */
+
+section > :where(div, u, b) > :not(:where(b, span:has(+b)) ){
+    color: brown;
+}
+
+.btn {
+    display: inline-block;
+    border: solid 1px gray;
+    border-radius: 5px;
+    padding: 5px;
+    background: linear-gradient(#3c3, #4d4 10%, #4d4 80%, #2a2);
+    cursor: pointer;
+    text-decoration: none;
+    text-wrap: nowrap;
+
+    &:hover  {
+        background: linear-gradient(#c33, #d44 10%, #d44 80%, #a22);
+    }
+
+    &:link {
+        color: blue;
+    }
+
+    &:focus {
+        color: black;
+        font-weight: bold;
+    }
+
+    &:active {
+        color: yellow;
+    }
+
+    &:visited {
+        color: #444;
+    }
+
+    &:disabled {
+        color: lightgray;
+        background: gray !important;
+    }
+}
+
+.hide {
+    display: none;
+}
+
+.hint {
+    /*display: none;*/
+    margin: 0;
+    color: black;
+    transition: all 2s .25s ease-in-out;
+}
+
+:checked+.hint{
+    /*display: inline-block;*/
+    margin-top: 300px;
+    color: red;
+}
+.hint.-left{
+    margin-left: 100px;
+}
+
+.to-up {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    vertical-align: middle;
+    text-align: center;
+    background-color: gray;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    bottom:50px;
+    right: 50px;
+}
+
+.start-anim{
+    background: radial-gradient(red, yellow 50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    display: inline-block;
+    position: relative;
+
+    animation: start-page 10s;
+    animation-direction: normal;
+    animation-delay: .5s;
+    animation-iteration-count: infinite;
+}
+
+@media screen and (max-width: 720px) {
+    header img {
+        float: left;
+    }
+    header nav {
+        max-width: calc(100% - 100px);
+    }
+
+    .-grid-page{
+        grid-template-areas: 
+            "header header"
+            "content aside"
+            "footer footer";
+        grid-template-columns: auto 100px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    :root {
+        --header-height: 130px;
+    }
+}
