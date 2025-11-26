@@ -11,35 +11,40 @@ foreach($_SERVER as $key => $value)
     } else
         echo "$key = $value<br>";
 */
-$users = include 'DATA/users.php';
+include_once "lib/utils.php";
+include_once "lib/session.php";
+include 'DATA/users.php';
 
-$userNum = -1;
-foreach($users as $num => $user)
-    if($user['login'] == $_POST['login'])
-        $userNum = $num;
+if(isset($_SESSION['error']))
+    unset($_SESSION['error']);
 
-if($userNum == -1){
-    header('Location: '. $_SERVER['HTTP_REFERER'].
-        (strpos($_SERVER['HTTP_REFERER'], '?') === false ? '?' : '&')
-        .'error=Пользователь несуществует');
-    exit;
+$user = getUserByLogin($_POST['login']);
+
+if($user === null){
+    $_SESSION['error'] = 'Пользователь несуществует';
+    redirect();
+    //redirect(addUrlParam($_SERVER['HTTP_REFERER'], 'error', 'Пользователь несуществует'));
 }
 
-if($users[$userNum]['password'] != $_POST['pass']){
-    header('Location: '. $_SERVER['HTTP_REFERER'].
-        (strpos($_SERVER['HTTP_REFERER'], '?') === false ? '?' : '&')
-        .'error=Не верно указан логин или пароль');
-    exit;
+if($user['password'] != $_POST['pass']){
+    $_SESSION['error'] = 'Не верно указан логин или пароль';
+    redirect();
+    //redirect(addUrlParam($_SERVER['HTTP_REFERER'], 'error', 'Не верно указан логин или пароль'));
 }
-
+    
+    
 /*$datetime = time() + 60 * 60;
 $date = date('r', $datetime);
 header('Set-Cookie: hasAuth=1; Experies='.$date,false);*/
 
-$time = time()+60*60;
-setcookie('hasAuth', '1', $time);
+//$time = time()+60*60;
+//setcookie('hasAuth', '1', $time);
 //setcookie('hasAuth', '1', 0); //- для хранении куки-переменной, пока пользователь не закроет браузер
 //setcookie('hasAuth', '1', 1); //- для удаления куки-переменной
-setcookie('UID', $users[$userNum]['id'], $time);
-header('Location: '. $_SERVER['HTTP_REFERER']);
+//setcookie('UID', $users[$userNum]['id'], $time);
+
+$_SESSION['hasAuth'] = true;
+$_SESSION['UID'] = $user['id'];
+redirect();
+//redirect(delUrlParam($_SERVER['HTTP_REFERER'], 'error'));
 

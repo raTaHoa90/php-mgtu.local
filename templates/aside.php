@@ -1,7 +1,7 @@
 <div class="panel">
-    <div class="avatar" style="background-image: url(/img/profile.jpg)">
+    <div class="avatar" style="background-image: url(<?= $user['avatar'] ?>)">
     </div>
-    <center><b>Сергеев Д.Н.</b></center>
+    <center><b><?= $user['fio'] ?></b></center>
 </div>
 
 <div class="panel">
@@ -17,8 +17,8 @@
 
 <div class="panel -info">
     <table>
-        <tr><td>Город:</td><td>Москва</td></tr>
-        <tr><td>Рабора:</td><td>МГТУ</td></tr>
-        <tr><td>Телефон:</td><td><a href="tel: 89001234567">89001234567</a></td></tr>
+        <tr><td>Город:</td><td><?= $user['city'] ?></td></tr>
+        <tr><td>Рабора:</td><td><?= $user['job'] ?></td></tr>
+        <tr><td>Телефон:</td><td><a href="tel: <?= $user['tel'] ?>"><?= $user['tel'] ?></a></td></tr>
     </table>
 </div>

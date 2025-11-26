@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="/css/profile.css">
 <link rel="stylesheet" href="/css/rss.css">
 
 <section class="panel">
