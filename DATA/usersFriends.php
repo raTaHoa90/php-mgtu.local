@@ -1,6 +1,10 @@
 <?php
 include_once "users.php";
 $usersFriends = json_decode(file_get_contents('DATA/usersFriends.json'), true);
+/*
+    user_one_id:
+    user_two_id:
+*/
 //echo json_encode($users);
 
 function getFriendsByUserID(int $id): ?array {

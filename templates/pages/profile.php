@@ -1,8 +1,9 @@
+
 <section class="panel">
     <?php if(isset($error)):?>
     <div class='error'><?= $error ?></div>
     <?php endif; ?>
-    <form action="saveProfile.php" method="POST" enctype="multipart/form-data">
+    <form action="/POST/saveProfile.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="uid" value="<?= $user['id'] ?>">
         <table>
             <tr>

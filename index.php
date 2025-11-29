@@ -10,9 +10,12 @@
         $action = '404';
         http_response_code(404);
     }
-    $isAuth = isset($_SESSION['hasAuth']);
-    $user = $isAuth ? getUserByID($_SESSION['UID']) : null;
-    
+    AutoAuth(false);
+    $thisUser = $user;
+
+    $curUser = getUserByID($_GET['f_id'] ?? 0);
+    if($curUser !== null && $curUser['id'] != $user['id'])
+        $user = $curUser;
     //$isAuth = isset($_COOKIE['hasAuth']);
 ?>
 <!DOCTYPE html>

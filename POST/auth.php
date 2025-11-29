@@ -11,6 +11,7 @@ foreach($_SERVER as $key => $value)
     } else
         echo "$key = $value<br>";
 */
+chdir('..');
 include_once "lib/utils.php";
 include_once "lib/session.php";
 include 'DATA/users.php';

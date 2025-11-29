@@ -1,5 +1,10 @@
 <?php
     include_once "DATA/posts.php";
+    if($curUser === null){
+        include '404.php';
+        exit;
+    }
+
     $path = 'img/photos_'.$user['id'];
     $photos = getAllPhotos();
     $userPosts = getPostsByUser($user['id']);

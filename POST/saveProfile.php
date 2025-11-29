@@ -1,13 +1,10 @@
 <?php
+chdir('..');
 include_once "lib/utils.php";
 include_once "lib/session.php";
 include 'DATA/users.php';
 
-$isAuth = isset($_SESSION['hasAuth']);
-$user = $isAuth ? getUserByID($_SESSION['UID']) : null;
-
-if(!$user) 
-    redirect();
+AutoAuth(true);
 
 unset($_SESSION['error']);
 
