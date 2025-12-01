@@ -35,10 +35,10 @@
     ?>
 
     <aside id="left">
-        <?php
-            if($isAuth)
-                include "templates/menu.php";
-        ?>
+        <?php if($isAuth): ?>
+            <!-- {{CONTENT}} -->
+            <?php include "templates/menu.php"; ?>
+        <?php endif; ?>
     </aside>
 
     <main id="contents">
