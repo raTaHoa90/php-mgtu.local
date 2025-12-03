@@ -36,8 +36,22 @@ header {
 
         & li {
             display: inline-block;
+            margin-right: 10px;
         }
     }
+}
+
+.avatar {
+    display: inline-block;
+    height: 180px;
+    width: 180px;
+    overflow: hidden;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    clip-path: circle(50%);
+
+    margin-bottom: 5px;
 }
 
 #logo {

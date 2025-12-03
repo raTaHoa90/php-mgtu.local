@@ -2,6 +2,7 @@
 
 $routes = config('routes',[]);
 $hasDefaultPath = false;
+$_tempParams;
 
 function redirect($toUrl = ''){
     if(empty($toUrl))
@@ -11,7 +12,7 @@ function redirect($toUrl = ''){
 }
 
 function routeFind(array $pathes, array $routes){
-    global $hasDefaultPath;
+    global $hasDefaultPath, $_tempParams;
     if(count($pathes) == 0 || (count($pathes) == 1 && $pathes[0] == '')){
         // если у нас закончился введеный пользователем путь, 
         // то проверяем наличие ключа по умолчанию, и если он есть,
@@ -34,7 +35,20 @@ function routeFind(array $pathes, array $routes){
         // если мы достигли конечной настройки, в ключе будет имя скрипта, который необходимо запустить
         if(count($pathes) == 0)
             return $routes[$path];
-    } 
+    } else {
+        $varUrl = array_find(array_keys($routes), fn($value)=>strlen($value) > 0 && $value[0] == '@');
+        if($varUrl){
+            $_tempParams[substr($varUrl, 1)] = $path;
+
+            // у нас есть вложенные пути по этому ключу, входим на новую инетацию
+            if(is_array($routes[$varUrl]))
+                return routeFind($pathes, $routes[$varUrl]);
+            
+            // если мы достигли конечной настройки, в ключе будет имя скрипта, который необходимо запустить
+            if(count($pathes) == 0)
+                return $routes[$varUrl];
+        }
+    }
     return "404";
 }
 
@@ -45,7 +59,9 @@ function page404(){
 }
 
 function routeGetScript(){
-    global $routes, $hasDefaultPath;
+    global $routes, $hasDefaultPath, $_tempParams;
+    $_tempParams = [];
+
     // убираем из пути GET-переменные ("/dir1/dir2/dir3?key1=1&key2=2" => "/dir1/dir2/dir3")
     $path = explode('?', $_SERVER['REQUEST_URI'])[0];
     // разбиваем путь адреса на части ("/dir1/dir2/dir3" => ['','dir1','dir2','dir3'])
@@ -72,7 +88,7 @@ function routeGetScript(){
         $func = $method.'_'.$name;
         if(function_exists($func))
             // вызываем метод 
-            $func();
+            $func($_tempParams);
         else
             page404();
     } else

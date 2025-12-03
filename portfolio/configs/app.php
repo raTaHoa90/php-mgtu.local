@@ -4,6 +4,7 @@ return [
     'paths' => [
         'controllers' => 'controllers',
         'templates' => 'views',
-        'temp' => 'temp'
+        'temp' => 'temp',
+        'models' => 'DATA'
     ]
 ];

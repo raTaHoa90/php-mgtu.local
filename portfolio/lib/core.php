@@ -1,5 +1,8 @@
 <?php
+$isAuth = false;
+$authUser = null;
 $globalConfigs = [];
+$models = [];
 
 function config($name, $defaultValue = null){
     global $globalConfigs;
@@ -24,7 +27,38 @@ function config($name, $defaultValue = null){
     return $configs ?? $defaultValue;
 }
 
+function AutoAuth(){
+    global $isAuth, $authUser;
+    if($authUser === null){
+        $isAuth = isset($_SESSION['hasAuth']);
+        $authUser = $isAuth ? getUserByID($_SESSION['UID']) : null;
+    }
+    return $authUser;
+}
+
+function loadModel($name){
+    global $models;
+    if(!isset($models[$name]) ){
+        include_once config('app.paths.models', 'models')."/$name.php";
+        $file = file_get_contents(config('app.paths.models')."/$name.json");
+        /*
+            id:
+            login:
+            password:
+            avatar: 
+            fio:
+            city:
+            job:
+            tel:
+            age:
+        */
+        $models[$name] = json_decode($file, true);
+    }
+    return $models[$name];
+}
 
 include_once 'session.php';
 include_once 'Routes.php';
 include_once 'View.php';
+
+loadModel('users');
