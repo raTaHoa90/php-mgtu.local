@@ -27,6 +27,32 @@
 
 </section>
 
-<section>
-    
+<section class="files">
+    <?php foreach($catalogs as $entity): 
+        if($entity['type'] == 'dir'):
+    ?>
+        <div class='dir'>
+            <img src="/imgs/ext/dir.png"><br>
+            <b><a href="?path=<?= $entity['name'] == '..' ? $topPath : $currentPath.'/'.$entity['name'] ?>"><?= $entity['name'] ?></a></b>
+        </div>
+    <?php else: 
+        if(in_array($entity['ext'], $EXT_PIC))
+            $filePic = $userpath.$entity['name'];
+        else if( in_array($entity['ext'], $EXT_DOC) )
+            $filePic = '/imgs/ext/icon_' + $entity['ext'] + '.png';
+        else if($entity['ext'] == 'txt')
+            $filePic = '/imgs/ext/icon_txt.webp';
+        else 
+            $filePic = "/imgs/ext/file.png";
+    ?>
+        <div class='file'>
+            <img src="<?= $filePic ?>"><br>
+            <a target="_blank" href="<?= $userpath.$entity['name'] ?>"><?= $entity['name'] ?></a>
+            <div class="file-info">
+                <i><?= $entity['size'] ?></i><br>
+                <span><?= $entity['created_at'] ?></span>
+            </div>
+        </div>
+    <?php endif; 
+    endforeach ?>
 </section>

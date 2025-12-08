@@ -16,6 +16,7 @@ var catalogs = {
     },
     loadDir: function(){
         $('.files').html('');
+        $('#pathdir').html(this.path != '' ? this.path : '/');
         $.post('/admin/catalogs/getCatalogs', {path: this.path}, req => {
             if(req.error){
                 this.addError(req.error);
@@ -44,6 +45,22 @@ var catalogs = {
             else if(req.error)
                 this.addError(req.error);
             $('#dirname').val('');
+        },'json');
+    },
+    deleteDir: function(dirname, divDir){
+        $.post('/admin/catalogs/deleteDir', {path: this.path, dirname}, req => {
+            if(req.ok)
+                divDir.remove();
+            else if(req.error)
+                this.addError(req.error);
+        },'json');
+    },
+    deleteFile: function(filename, divFile){
+        $.post('/admin/catalogs/deleteFile', {path: this.path, filename}, req => {
+            if(req.ok)
+                divFile.remove();
+            else if(req.error)
+                this.addError(req.error);
         },'json');
     },
     uploadFile: function(){
@@ -84,8 +101,11 @@ var catalogs = {
 
     fileView: function(data){
         let tmpl = file_templ.content.cloneNode(true),
-            div = tmpl.querySelector('.file'),
-            img = div.querySelector('img');
+            div = tmpl.querySelector('.file');
+
+        div.innerHTML = div.innerHTML.replace(/#=FileName=#/g, data.name);
+
+        let img = div.querySelector('img');
 
 
         if(EXT_PIC.includes(data.ext))
@@ -107,6 +127,10 @@ var catalogs = {
     dirView: function(name){
         let tmpl = dir_templ.content.cloneNode(true),
             div = tmpl.querySelector('.dir');
+        if(name != '..')
+            div.innerHTML = div.innerHTML.replace(/#=DirName=#/g, name);
+        else
+            $('span', div).remove();
         $('a', div).html(name).click(e=>{
             if(name == '..'){
                 if(this.path == '') return;
