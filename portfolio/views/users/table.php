@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="/css/profile.css">
 
 <section class="-flex">
-    <?php foreach($users as $user): ?>
+    <?php foreach($users as $user): if(isset($user['fio'])): ?>
     <div class="user" onclick="location = '/users/<?= $user['login'] ?>'">
         <h3><?= $user['fio'] ?></h3>
         <?php if(isset($user['avatar']) && $user['avatar']): ?>
@@ -19,5 +19,5 @@
             <a href="https://t.me/<?= substr($user['telegram'], 1) ?>"><i class="fa fa-telegram"></i> <?= $user['telegram'] ?></a><br>
         <?php endif; ?>
     </div>
-    <?php endforeach; ?>
+    <?php endif; endforeach; ?>
 </section>

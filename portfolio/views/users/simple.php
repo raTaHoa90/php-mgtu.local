@@ -54,5 +54,5 @@
             </div>
         </div>
     <?php endif; 
-    endforeach ?>
+    endforeach; ?>
 </section>
