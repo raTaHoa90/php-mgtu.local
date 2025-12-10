@@ -1,0 +1,70 @@
+<?php
+namespace lib;
+
+class Route {
+    private string $_type;  // GET || POST
+    private array $_pathes; // путь по которому прошел пользователь
+
+    private string $_controller; // контроллер, который необходимо загрузить
+    private string $_method;     // метод, который необходимо выполнить в контролере
+    private string $_name;
+
+    public array $variables = [];
+
+    function __construct(string $type, string $path, string $binding)
+    {
+        $this->_type = $type;
+        
+        $pathes = explode('/', $path);
+        $this->_pathes = [];
+        foreach($pathes as $path)
+            if(trim($path) != '')
+                $this->_pathes[] = trim($path);
+                // ex//test => ex/test
+                // ex / test => ex/test
+
+        $temp = preg_split("/[@#]/", $binding); // classname@method#namePath
+        if(strpos($binding, "@") === false && isset($temp[1])){
+            unset($temp[1]);
+            $temp[2] = $temp[1];
+        }
+
+        $this->_controller = $temp[0];
+        $this->_method = $temp[1] ?? 'index';
+
+        $last = $this->_pathes[count($this->_pathes)-1];
+        if($last[0] == '@')
+            $last = $this->_method;
+
+        $this->_name = $temp[2] ?? $last;
+    }
+
+    function compare(string $type, array $pathes){
+        if($type != $this->_type && $this->_type != 'ANY')
+            return false;
+
+        if(count($pathes) != count($this->_pathes))
+            return false;
+
+        $this->variables = [];
+
+        foreach($pathes as $i => $path)
+            if($this->_pathes[$i][0] == '@')
+                $this->variables[substr($this->_pathes[$i], 1)] = $path;
+            elseif($this->_pathes[$i] != $path)
+                return false;
+
+        return true;
+    }
+
+    function Invoke(){
+        $path = config('app.paths.controllers', 'Controller');
+        $path = trim($path, ".\\/");
+        $path = strtr($path, ['/' => '\\']);
+        $objController = new ($path.'\\'.$this->_controller)($this->_name);
+        if(method_exists($objController, $this->_method))
+            $objController->{$this->_method}($this->variables);
+        else
+            throw "ERROR: Controller not found";
+    }
+}
