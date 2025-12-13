@@ -15,6 +15,8 @@ class Route {
     {
         $this->_type = $type;
         
+        // разбиваем указанный путь на массив
+        // /example/@path/test => ['example', '@path', 'test']
         $pathes = explode('/', $path);
         $this->_pathes = [];
         foreach($pathes as $path)
@@ -23,17 +25,21 @@ class Route {
                 // ex//test => ex/test
                 // ex / test => ex/test
 
-        $temp = preg_split("/[@#]/", $binding); // classname@method#namePath
+        if(!$this->_pathes)
+            $this->_pathes[] = '';
+
+        // classname@method#namePath => ['classname', 'method', 'namePath']
+        $temp = preg_split("/[@#]/", $binding); 
         if(strpos($binding, "@") === false && isset($temp[1])){
             unset($temp[1]);
             $temp[2] = $temp[1];
         }
 
-        $this->_controller = $temp[0];
+        $this->_controller = strtr($temp[0], ['/' => '\\']);
         $this->_method = $temp[1] ?? 'index';
 
         $last = $this->_pathes[count($this->_pathes)-1];
-        if($last[0] == '@')
+        if($last == '' || $last[0] == '@')
             $last = $this->_method;
 
         $this->_name = $temp[2] ?? $last;
@@ -49,7 +55,7 @@ class Route {
         $this->variables = [];
 
         foreach($pathes as $i => $path)
-            if($this->_pathes[$i][0] == '@')
+            if($this->_pathes[$i] && $this->_pathes[$i][0] == '@')
                 $this->variables[substr($this->_pathes[$i], 1)] = $path;
             elseif($this->_pathes[$i] != $path)
                 return false;

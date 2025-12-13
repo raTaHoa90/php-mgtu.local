@@ -12,66 +12,80 @@
 */
 //echo json_encode($users);
 
-const CONTINUE_ARRAY = ['.', '..'];
+namespace DATA;
 
-function getUserByID(int $id): ?array {
-    $users = loadModel('users');
-    foreach($users as $user)
-        if($user['id'] == $id)
-            return $user;
-    return null;
-}
+use lib\SYS;
 
-function getUserByLogin(string $login): ?array {
-    $users = loadModel('users');
-    foreach($users as $user)
-        if($user['login'] == $login)
-            return $user;
-    return null;
-}
+class Users extends Model {
 
-function saveUserData(int $id, array $data): bool {
-    $users = loadModel('users');
-    $numUser = -1;
-    foreach($users as $num => $user)
-        if($user['id'] == $id)
-            $numUser = $num;
+    const CONTINUE_ARRAY = ['.', '..'];
 
-    if($numUser < 0)
-        return false;
-
-    $users[$numUser] = $data;
-    file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
-    return true;
-}
-
-function createUserData(array $data): bool {
-    $users = loadModel('users');
-
-    $users = loadModel('users');
-    $max = array_reduce($users, fn($max, $user)=> max($max, $user['id']), 0);
-    $max++;
-
-    $data['id'] = $max;
-    $users[] = $data;
-    file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
-    return true;
-}
-
-function getAllPhotos(){
-    $user = AutoAuth();
-    $path = 'img/photos_'.$user['id'];
-    
-    $result = [];
-    if(!is_dir($path))
-        return $result;
-
-    $catalog = dir($path);
-    while(false !== ($entry = $catalog->read())){
-        //echo $entry.'<br>';
-        if(!in_array($entry, CONTINUE_ARRAY) && !is_dir('img/'.$entry)) 
-            $result[] = $entry;
+    static function all(){
+        $users = SYS::loadModel('users');
+        return array_map(fn($user)=>new Users($user), $users); 
     }
 
-    return $result;
+    static function getUserByID(int $id): ?Users {
+        $users = SYS::loadModel('users');
+        foreach($users as $user)
+            if($user['id'] == $id)
+                return new static($user);
+        return null;
+    }
+
+    static function getUserByLogin(string $login): ?Users {
+        $users = SYS::loadModel('users');
+        foreach($users as $user)
+            if($user['login'] == $login)
+                return new static($user);
+        return null;
+    }
+
+    static function create(array $data): Users {
+        $users = SYS::loadModel('users');
+
+        $max = array_reduce($users, fn($max, $user)=> max($max, $user['id']), 0);
+        $max++;
+
+        $data['id'] = $max;
+        $users[] = $data;
+        file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
+        return new static($data);
+    }
+
+    //==============================================================
+
+    function save(): bool {
+        $users = SYS::loadModel('users');
+        $numUser = -1;
+        foreach($users as $num => $user)
+            if($user['id'] == $this->id)
+                $numUser = $num;
+
+        if($numUser < 0)
+            return false;
+
+        $users[$numUser] = $this->getData();
+        file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
+        return true;
+    }
+
+    function getAllPhotos(): array{
+        $path = 'img/photos_'.$this->id;
+        
+        $result = [];
+        if(!is_dir($path))
+            return $result;
+
+        $catalogs = scandir($path);
+        foreach($catalogs as $entry)
+            if(!in_array($entry, static::CONTINUE_ARRAY) && !is_dir('img/'.$entry)) 
+                $result[] = $entry;
+
+        return $result;
+    }
+
+    function pathPublic(){
+        return 'public/storage/'.$this->id.'_catalog';
+    }
 }

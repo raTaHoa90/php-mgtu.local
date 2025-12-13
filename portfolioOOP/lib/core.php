@@ -1,6 +1,8 @@
 <?php
 namespace lib;
 
+use DATA\Users;
+
 class SYS {
     static $isAuth = false;
     static $authUser = null;
@@ -9,18 +11,28 @@ class SYS {
 
     static ?SysSession $session = null;
     static ?View $view = null;
+    static ?Routes $routes = null;
     static $shared = [];
 
     static function Init(){
         static::$session = new SysSession;
         static::$view = new View;
+
+        if(config('session.is_auth', false))
+            static::$isAuth = isset(SYS::$session['hasAuth']);
+
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
+        static::$routes = new Routes;
+        (static::$routes)();
     }
 
     static function AutoAuth(){
         global $isAuth, $authUser;
         if($authUser === null){
-            $isAuth = isset($_SESSION['hasAuth']);
-            $authUser = $isAuth ? getUserByID($_SESSION['UID']) : null;
+            $isAuth = isset(SYS::$session['hasAuth']);
+            $authUser = $isAuth ? Users::getUserByID(SYS::$session['UID']) : null;
         }
         return $authUser;
     }
@@ -47,6 +59,7 @@ class SYS {
     }
 }
 
+// Автозагрузчик классов
 spl_autoload_register(function($className){
     $loadPath = strtr($className, ['\\'=>'/']).'.php';
     if(is_file($loadPath)){
@@ -65,9 +78,3 @@ spl_autoload_register(function($className){
 });
 
 include_once "utilits.php";
-
-//include_once 'session.php';
-include_once 'Routes.php';
-//include_once 'View.php';
-
-//loadModel('users');
