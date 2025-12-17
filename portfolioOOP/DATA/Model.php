@@ -2,16 +2,78 @@
 
 namespace DATA;
 
+use lib\DB\DataBase;
+use lib\SYS;
+
 class Model {
     private array $fields = [];
     public int $id;
+
+    private bool $_is_new = false;
+
+    static function all(){
+        return static::table('SELECT * FROM '.static::getTable().';');
+    }
+
+    static function find(int $id){
+        $result = static::table('SELECT * FROM '.static::getTable().' WHERE id=$? LIMIT 1', [$id]);
+        return $result[0] ?? null;
+    }
+
+    static function table(string $sql, ?array $params = null){
+        return SYS::$DB->table($sql, $params, DataBase::TYPE_OBJECT, static::class);
+    }
+
+    static private function _class_to_table_name(string $name): string {
+        $name = basename($name);
+        $name = preg_replace('/([A-Z])/', '_\1', $name);
+        return strtolower(trim($name,'_'));
+    }
+
+    static function getTable(){
+        return static::class == self::class
+            ? false
+            : static::_class_to_table_name(static::class);
+    }
+
+    function save(){
+        if($this->_is_new){ // INSERT
+            $insert = "INSERT INTO ".static::getTable()."(";
+            $values = [];
+            $firstKey = true;
+            foreach($this->fields as $key => $value){
+                $insert .= ($firstKey ? '' : ', '). $key;
+                $firstKey = false;
+                $values[] = $value;
+            }
+            $insert .= ') VALUES (';
+            for($i = 0; $i < count($values); $i++)
+                $insert .= ($i > 0 ? ', ' : '') . '$?';
+            $insert .= ')';
+            
+            $this->id = SYS::$DB->insertGetId($insert, $values);
+        } else { // UPDATE
+            $update = "UPDATE ".static::getTable()." SET ";
+            $values = [];
+            $firstKey = true;
+            foreach($this->fields as $key => $value){
+                $update .= ($firstKey ? '' : ', '). "$key=$?";
+                $firstKey = false;
+                $values[] = $value;
+            }
+            $update .= ' WHERE id='.$this->id;
+            
+            SYS::$DB->queryClose($update, $values);
+        }
+    }
     
-    function __construct($data = null)
+    function __construct($data = null) // [] = создаем новую запись, null - запись загрузилась из БД
     {
         if($data === null) return;
-        $this->id = $data['id'];
+        $this->id = $data['id'] ?? -1;
         unset($data['id']);
         $this->fields = $data;
+        $this->_is_new = true;
     }
 
     function __get($name) {

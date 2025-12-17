@@ -9,7 +9,7 @@
         <?php if(isset($user->avatar) && $user->avatar): ?>
         <img class="avatar" src="/storage/avatars/<?= $user->avatar ?>">
         <?php endif; ?>
-        <div class="desc"><?= strtr($user->desc ?? '', ["\n"=>'<br>']) ?></div>
+        <div class="desc"><?= strtr($user->description ?? '', ["\n"=>'<br>']) ?></div>
         <b>Контакты:</b><br>
         <?php if(isset($user->tel) && $user->tel): ?>
             <a href="tel:<?= $user->tel ?>"><i class="fa fa-mobile"></i> <?= $user->tel ?></a><br>

@@ -2,8 +2,16 @@
 namespace lib;
 
 use DATA\Users;
+use lib\DB\DataBase;
+use lib\DB\DBMySqlDriver;
+use lib\DB\DBPgSqlDriver;
 
 class SYS {
+    const DB_DRIVERS = [
+        'MySQL' => DBMySqlDriver::class,
+        'PgSQL' => DBPgSqlDriver::class
+    ];
+
     static $isAuth = false;
     static $authUser = null;
     static $configs = [];
@@ -12,11 +20,25 @@ class SYS {
     static ?SysSession $session = null;
     static ?View $view = null;
     static ?Routes $routes = null;
+    static ?DataBase $DB = null;
     static $shared = [];
 
     static function Init(){
         static::$session = new SysSession;
         static::$view = new View;
+
+        $dbDriver = config('database.driver', null);
+
+        if(isset(static::DB_DRIVERS[$dbDriver])){
+            DataBase::$debug = config('app.debug');
+            static::$DB = new (static::DB_DRIVERS[$dbDriver])(
+                config('database.host'), 
+                config('database.dbname'),
+                config('database.user'),
+                config('database.password'),
+                config('database.port')
+            );
+        }
 
         if(config('session.is_auth', false))
             static::$isAuth = isset(SYS::$session['hasAuth']);
@@ -32,7 +54,7 @@ class SYS {
         global $isAuth, $authUser;
         if($authUser === null){
             $isAuth = isset(SYS::$session['hasAuth']);
-            $authUser = $isAuth ? Users::getUserByID(SYS::$session['UID']) : null;
+            $authUser = $isAuth ? Users::find(SYS::$session['UID']) : null;
         }
         return $authUser;
     }

@@ -21,53 +21,27 @@ class Users extends Model {
     const CONTINUE_ARRAY = ['.', '..'];
 
     static function all(){
-        $users = SYS::loadModel('users');
-        return array_map(fn($user)=>new Users($user), $users); 
-    }
-
-    static function getUserByID(int $id): ?Users {
-        $users = SYS::loadModel('users');
-        foreach($users as $user)
-            if($user['id'] == $id)
-                return new static($user);
-        return null;
+        return static::table("SELECT * FROM users WHERE deleted_at is null AND fio <> '' ORDER BY fio");
     }
 
     static function getUserByLogin(string $login): ?Users {
-        $users = SYS::loadModel('users');
-        foreach($users as $user)
-            if($user['login'] == $login)
-                return new static($user);
-        return null;
+        $result = static::table('SELECT * FROM '.static::getTable().' WHERE login=$? LIMIT 1', [$login]);
+        return $result[0] ?? null;
     }
 
-    static function create(array $data): Users {
-        $users = SYS::loadModel('users');
-
-        $max = array_reduce($users, fn($max, $user)=> max($max, $user['id']), 0);
-        $max++;
-
-        $data['id'] = $max;
-        $users[] = $data;
-        file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
-        return new static($data);
+    static function create(array $data = []): Users {
+        $user = new static($data);
+        $user->save();
+        return $user;
     }
 
     //==============================================================
+    function setPassword(string $password){
+        $this->password = password_hash($password, PASSWORD_DEFAULT);
+    }
 
-    function save(): bool {
-        $users = SYS::loadModel('users');
-        $numUser = -1;
-        foreach($users as $num => $user)
-            if($user['id'] == $this->id)
-                $numUser = $num;
-
-        if($numUser < 0)
-            return false;
-
-        $users[$numUser] = $this->getData();
-        file_put_contents(config('app.paths.models').'/users.json', json_encode($users));
-        return true;
+    function testPassword(string $password): bool{
+        return password_verify($password, $this->password);
     }
 
     function getAllPhotos(): array{

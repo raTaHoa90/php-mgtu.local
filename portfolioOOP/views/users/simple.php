@@ -23,7 +23,7 @@
             <a href="https://t.me/<?= substr($user->telegram, 1) ?>"><i class="fa fa-telegram"></i> <?= $user->telegram ?></a>
         <?php endif; ?>
     </div><br>
-    <?= strtr($user->desc ?? '', ["\n" => '<br>']) ?>
+    <?= strtr($user->description ?? '', ["\n" => '<br>']) ?>
 
 </section>
 

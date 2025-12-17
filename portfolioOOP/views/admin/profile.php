@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td>О себе:</td>
-                <td><textarea autocomplete="off" name="desc" rows=10 cols=50><?= $user->desc ?? '' ?></textarea></td>
+                <td><textarea autocomplete="off" name="desc" rows=10 cols=50><?= $user->description ?? '' ?></textarea></td>
             </tr>
             <tr>
                 <td></td>
