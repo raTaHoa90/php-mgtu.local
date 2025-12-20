@@ -1,0 +1,2 @@
+Disallow: /admin/
+Sitemap: https://portfolio-opp.php-mgtu.local/sitemap/main.xml

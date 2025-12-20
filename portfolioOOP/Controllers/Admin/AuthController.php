@@ -18,9 +18,11 @@ class AuthController extends BaseAuthController {
             unset(SYS::$session['error']);
 
         $user = Users::getUserByLogin($_POST['login']);
+        if($user === null)
+            $user = Users::getUserByEmail($_POST['login']);
 
         if($user === null){
-            SYS::$session['error'] = 'Пользователь несуществует';
+            SYS::$session['error'] = 'Пользователь не существует';
             SYS::redirect('/admin/auth');
         }
 

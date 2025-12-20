@@ -3,6 +3,7 @@
 namespace Controllers\Admin;
 
 use DATA\Users;
+use lib\MailAgent;
 use lib\SYS;
 
 class RegistrationController extends BaseAuthController {
@@ -26,13 +27,43 @@ class RegistrationController extends BaseAuthController {
             SYS::back();
         }
 
+        if(isset($_POST['email']) && !$_POST['email'] && 
+            !SYS::emailValidation($_POST['email'])
+        ){
+            SYS::$session['error'] = 'Неправильно введен Email';
+            SYS::back();
+        }
+
+        $login = trim($_POST['login']);
+        $password = $_POST['pass'];
+
         $user = [
-            'password' => $_POST['pass'],
-            'login' => $_POST['login']
+            'password' => '',
+            'login' => $login,
+            'email' => trim($_POST['email'])
         ];
 
-        if(Users::create($user) === null)
+        $user = Users::create($user);
+        if($user === null)
             SYS::$session['error'] = 'Неудалось сохранить пользователя';
+
+        $user->setPassword($_POST['pass'])->save();
+
+        $mail = new MailAgent();
+        $mail->addAddress($user->email);
+        $mail->setMessage('Вы зарегестрировались на сайте Портфолио', <<<ENDMESSAGE
+            <!DOCTYPE html>
+            <html>
+                <head></head>
+                <body>
+                    Вы зарегистрировались на нашем сайте портфолио!<br>
+                    ваш логин: <b>$login</b><br>
+                    пароль: <b>$password</b><br><br>
+                    Добро пошаловать!!!
+                </body>
+            </html>
+        ENDMESSAGE);
+        $mail->send();
 
         SYS::redirect('/admin/auth');
     }

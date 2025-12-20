@@ -52,6 +52,8 @@ class Model {
             $insert .= ')';
             
             $this->id = SYS::$DB->insertGetId($insert, $values);
+
+            $this->_is_new = false;
         } else { // UPDATE
             $update = "UPDATE ".static::getTable()." SET ";
             $values = [];

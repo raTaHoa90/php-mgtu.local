@@ -29,6 +29,11 @@ class Users extends Model {
         return $result[0] ?? null;
     }
 
+    static function getUserByEmail(string $email): ?Users {
+        $result = static::table('SELECT * FROM '.static::getTable().' WHERE email=$? LIMIT 1', [$email]);
+        return $result[0] ?? null;
+    }
+
     static function create(array $data = []): Users {
         $user = new static($data);
         $user->save();
@@ -38,6 +43,7 @@ class Users extends Model {
     //==============================================================
     function setPassword(string $password){
         $this->password = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
     }
 
     function testPassword(string $password): bool{
@@ -61,5 +67,9 @@ class Users extends Model {
 
     function pathPublic(){
         return 'public/storage/'.$this->id.'_catalog';
+    }
+
+    function pathWeb(){
+        return 'storage/'.$this->id.'_catalog';
     }
 }

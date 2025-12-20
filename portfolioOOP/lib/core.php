@@ -79,6 +79,14 @@ class SYS {
     static function back(){
         static::$view->back();
     }
+
+    static function emailValidation($email){
+        return !!preg_match(
+            '/^([\w+-]+\.)*[\w+-]+\w@([\w-]+\.){1,3}[\w]{2,}$/i',
+            trim($email),
+            $matches
+        );
+    }
 }
 
 // Автозагрузчик классов
@@ -100,3 +108,4 @@ spl_autoload_register(function($className){
 });
 
 include_once "utilits.php";
+require "vendor/autoload.php";

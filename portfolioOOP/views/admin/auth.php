@@ -7,7 +7,7 @@
     <form action="/admin/auth" method="POST">
         <table>
             <tr>
-                <td class="-ta-r">Ваш логин:</td>
+                <td class="-ta-r">Ваш логин или почта:</td>
                 <td><input name="login" placeholder="exsample"></td>
             </tr>
             <tr>
